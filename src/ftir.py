@@ -15,7 +15,7 @@ import spectra
 
 if __name__ == "__main__":
 
-    data_path = Path.cwd() / "data"
+    data_path = Path.cwd() / "data" / "2022-01-21"
     data_files = []
     for csv_file in data_path.iterdir():
         data_files.append(csv_file)
