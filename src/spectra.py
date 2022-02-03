@@ -15,10 +15,10 @@ def wavelength_to_wavenumber(wavelengths):
     """Converts wavelengths (nm) to wavenumbers (cm^{-1}).
 
     Args:
-        wavelengths (numpy.array): Array of wavelengths, in nm.
+        wavelengths (numpy.array[float]): Array of wavelengths, in nm.
 
     Returns:
-        wavenumbers (numpy.array): Array of wavenumbers, in cm^{-1}.
+        wavenumbers (numpy.array[float]): Array of wavenumbers, in cm^{-1}.
     """
     wavenumbers = 1e7 / wavelengths
     return wavenumbers
@@ -28,10 +28,10 @@ def wavenumber_to_wavelength(wavenumbers):
     """Converts wavenumbers (cm^{-1}) to wavelengths (nm).
 
     Args:
-        wavenumbers (numpy.array): Array of wavenumbers, in cm^{-1}.
+        wavenumbers (numpy.array[float]): Array of wavenumbers, in cm^{-1}.
 
     Returns:
-        wavelengths (numpy.array): Array of wavelengths, in nm.
+        wavelengths (numpy.array[float]): Array of wavelengths, in nm.
     """
     wavelengths = 1e7 / wavenumbers
     return wavelengths
@@ -44,8 +44,8 @@ def read_data(path_csv):
         path_csv (pathlib.Path): Path to CSV file containing data.
 
     Returns:
-        x_data (numpy.array): Array containing independent variable data.
-        y_data (numpy.array): Array containing dependent variable data.
+        x_data (numpy.array[float]): Array containing independent variable data.
+        y_data (numpy.array[float]): Array containing dependent variable data.
     """
     data = pd.read_csv(path_csv, header=None)
     x_data = data.iloc[:, 0].to_numpy()
@@ -60,6 +60,7 @@ def plot_spectrum(
     title,
     x_label,
     y_label,
+    y_lim=None,
     wavelength_convert=False,
     save_fig=False,
     path_save=None,
@@ -68,13 +69,17 @@ def plot_spectrum(
     """Plots the input spectrum.
 
     Args:
-        wavenumber_data (numpy.array): Array containing wavenumber data.
-        y_data (numpy.array): Array containing dependent variable data.
+        wavenumber_data (numpy.array[float]): Array containing wavenumber data.
+        y_data (numpy.array[float]): Array containing dependent variable data.
         title (str): Plot title.
         x_label (str): Plot horizontal axis label.
         y_label (str): Plot vertical axis label.
-        wavelength_convert (bool, optional): Whether to convert wavenumber to wavelength units. Defaults to False.
-        save_fig (bool, optional): Whether to save output figure. Defaults to False.
+        y_lim (Tuple(float, float), optional): Tuple containing min and max of
+            vertical axis in plot window. Defaults to None.
+        wavelength_convert (bool, optional): Whether to convert wavenumber to
+            wavelength units. Defaults to False.
+        save_fig (bool, optional): Whether to save output figure. Defaults to
+            False.
         path_save (str, optional): Path to save output figure. Defaults to None.
     """
     if wavelength_convert:
@@ -82,6 +87,8 @@ def plot_spectrum(
 
     # plt.figure()
     plt.plot(wavenumber_data, y_data)
+    if y_lim is not None:
+        plt.ylim(y_lim)
 
     if not hold_on:
         plt.xlabel(x_label)
@@ -96,7 +103,8 @@ def plot_spectrum(
 
 
 def overlay_spectra(
-    paths_csv,
+    list_wavenumber_data,
+    list_y_data,
     title,
     x_label,
     y_label,
@@ -108,21 +116,40 @@ def overlay_spectra(
     """Plots multiple spectra on the same axes.
 
     Args:
-        paths_csv (List[str]): Array-like object containing paths to each CSV file containing spectra.
+        list_wavenumber_data (List[List[float]]): List of wavenumber arrays.
+        list_y_data (List[List[float]]): List of arrays of dependent variable data.
+            Same length as list_wavenumber_data.
         title (str): Plot title.
         x_label (str): Plot horizontal axis label.
         y_label (str): Plot vertical axis label.
-        plot_labels (List[str]): Legend for plot. Array-like object containing descriptor of each spectrum.
-        wavelength_convert (bool, optional): Whether to convert wavenumber to wavelength units. Defaults to False.
+        plot_labels (List[str]): Legend for plot. Array-like object containing
+            descriptor of each spectrum.
+        wavelength_convert (bool, optional): Whether to convert wavenumber to
+            wavelength units. Defaults to False.
         save_fig (bool, optional): Whether to save output figure. Defaults to False.
         path_save (str, optional): Path to save output figure. Defaults to None.
     """
     plt.figure()
-    for i in range(len(paths_csv)):
+    for i in range(len(list_wavenumber_data)):
         if wavelength_convert:
-            plot_spectrum(paths_csv[i], title, x_label, y_label, wavelength_convert=True, hold_on=True)
+            plot_spectrum(
+                list_wavenumber_data[i],
+                list_y_data[i],
+                title,
+                x_label,
+                y_label,
+                wavelength_convert=True,
+                hold_on=True,
+            )
         else:
-            plot_spectrum(paths_csv[i], title, x_label, y_label, hold_on=True)
+            plot_spectrum(
+                list_wavenumber_data[i],
+                list_y_data[i],
+                title,
+                x_label,
+                y_label,
+                hold_on=True,
+            )
     plt.legend(plot_labels)
 
     plt.xlabel(x_label)
@@ -140,16 +167,28 @@ def background_ratio(
     bkgd_path_csv,
     sample_path_csv,
 ):
+    """Ratios single-beam sample data against background to calculate % transmission.
 
+    Args:
+        bkgd_path_csv (pathlib.Path): Path to CSV file containing background data.
+        sample_path_csv (pathlib.Path): Path to CSV file containing sample data.
+
+    Returns:
+        wavenumbers (numpy.array[float]): Array containing wavenumber data.
+        transmission (numpy.array[float]): Array containing % transmission data.
+    """
     bkgd_data = pd.read_csv(bkgd_path_csv, header=None)
     bkgd_data.set_index(0, inplace=True)
+    bkgd_data.columns = ["background"]
 
     sample_data = pd.read_csv(sample_path_csv, header=None)
     sample_data.set_index(0, inplace=True)
+    sample_data.columns = ["sample"]
 
-    joined_data = bkgd_data.join(sample_data, how='inner')
-    joined_data.columns("background", "sample")
-    joined_data["transmission"] = joined_data.loc[:, "sample"] / joined_data.loc[:, "background"]
+    joined_data = bkgd_data.join(sample_data, how="inner")
+    joined_data["transmission"] = (
+        joined_data.loc[:, "sample"] / joined_data.loc[:, "background"]
+    )
 
     wavenumbers = joined_data.index.to_numpy()
     transmission = joined_data.loc[:, "transmission"].to_numpy()
@@ -165,4 +204,3 @@ def background_ratio(
 #     plt.plot()
 
 #     plt.figure()
-

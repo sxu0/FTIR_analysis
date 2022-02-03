@@ -25,31 +25,31 @@ if __name__ == "__main__":
 
     bkgd_wavenumbers, bkgd_intensity = spectra.read_data(data_files[0])
 
+    figure_path = Path.cwd() / "outputs" / "2021-01-21"
+    try:
+        Path.mkdir(figure_path)
+    except OSError:
+        pass
+
     # in wavenumber
-    figure_path = (
-        Path.cwd() / "outputs" / (str(data_files[0].name)[:-8] + "wavenumber.png")
-    )
     spectra.plot_spectrum(
         bkgd_wavenumbers,
         bkgd_intensity,
         "Background measurement: -95 kPa, 4.0 resolution",
         "Wavenumber (cm$^{-1}$)",
-        "TO CHECK",
+        "Intensity (arbitrary units)",
         save_fig=False,
-        path_save=figure_path,
-    )  # TODO
+        path_save=figure_path / (str(data_files[0].name)[:-8] + "wavenumber.png"),
+    )
 
     # in wavelength
-    figure_path = (
-        Path.cwd() / "outputs" / (str(data_files[0].name)[:-8] + "wavelength.png")
-    )
     spectra.plot_spectrum(
         bkgd_wavenumbers,
         bkgd_intensity,
         "Background measurement: -95 kPa, 4.0 resolution",
         "Wavelength (nm)",
-        "TO CHECK",
+        "Intensity (arbitrary units)",
         wavelength_convert=True,
         save_fig=False,
-        path_save=figure_path,
-    )  # TODO
+        path_save=figure_path / (str(data_files[0].name)[:-8] + "wavelength.png"),
+    )
