@@ -1,7 +1,7 @@
 """
-ftir.py
+2022-01-21.py
 
-Analyzes spectra and interferograms.
+Pokes around at prelim spectra collected on 2022-01-21.
 
 Author: Shiqi Xu
 """
@@ -23,28 +23,33 @@ if __name__ == "__main__":
     # for i in range(len(data_files)):
     #     print(data_files[i])
 
+    bkgd_wavenumbers, bkgd_intensity = spectra.read_data(data_files[0])
+
     # in wavenumber
     figure_path = (
-        Path.cwd() / "outputs" / (str(data_files[0].name)[11:-8] + "wavenumber.png")
+        Path.cwd() / "outputs" / (str(data_files[0].name)[:-8] + "wavenumber.png")
     )
-    spectra.plot_spectra(
-        data_files[0],
+    spectra.plot_spectrum(
+        bkgd_wavenumbers,
+        bkgd_intensity,
         "Background measurement: -95 kPa, 4.0 resolution",
         "Wavenumber (cm$^{-1}$)",
         "TO CHECK",
-        save_fig=True,
+        save_fig=False,
         path_save=figure_path,
     )  # TODO
+
     # in wavelength
     figure_path = (
-        Path.cwd() / "outputs" / (str(data_files[0].name)[11:-8] + "wavelength.png")
+        Path.cwd() / "outputs" / (str(data_files[0].name)[:-8] + "wavelength.png")
     )
-    spectra.plot_spectra(
-        data_files[0],
+    spectra.plot_spectrum(
+        bkgd_wavenumbers,
+        bkgd_intensity,
         "Background measurement: -95 kPa, 4.0 resolution",
         "Wavelength (nm)",
         "TO CHECK",
         wavelength_convert=True,
-        save_fig=True,
+        save_fig=False,
         path_save=figure_path,
     )  # TODO
