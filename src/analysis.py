@@ -7,7 +7,6 @@ Author: Shiqi Xu
 """
 
 from pathlib import Path
-import re
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -126,7 +125,13 @@ if __name__ == "__main__":
             list_co2_transmission.append(co2_transmission)
             list_pressures.append(int(pressure_labels[j][:-3]))
         plt.figure()
-        plt.plot(list_pressures, list_co2_transmission, "x")
+        plt.plot(list_pressures, list_co2_transmission, "o")
+        plt.errorbar(
+            list_pressures,
+            list_co2_transmission,
+            xerr=2,
+            fmt="none",
+        )  # pressure uncertainty = 2 kPa
         plt.title(
             "% transmission over CO$_2$ peak in " + sample_types[i] + ", by pressure"
         )
@@ -158,13 +163,13 @@ if __name__ == "__main__":
         Path.mkdir(figure_path / "resolution")
     except OSError:
         pass
-    # spectra.overlay_spectra(
-    #     list_argon_wavenumbers,
-    #     list_argon_intensities,
-    #     "Argon at 0 kPa, at different resolutions",
-    #     "Wavenumber (cm$^{-1}$)",
-    #     "Single-Beam Intensity (arbitrary units)",
-    #     ["1.0 resolution", "4.0 resolution", "16.0 resolution"],
-    #     save_fig=True,
-    #     path_save=figure_path / "resolution" / "argon_0kPa_by_resolution.png",
-    # )
+    spectra.overlay_spectra(
+        list_argon_wavenumbers,
+        list_argon_intensities,
+        "Argon at 0 kPa, at different resolutions",
+        "Wavenumber (cm$^{-1}$)",
+        "Single-Beam Intensity (arbitrary units)",
+        ["1.0 resolution", "4.0 resolution", "16.0 resolution"],
+        save_fig=True,
+        path_save=figure_path / "resolution" / "argon_0kPa_by_resolution.png",
+    )
