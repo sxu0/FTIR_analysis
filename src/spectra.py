@@ -232,11 +232,11 @@ def tot_transmission(
     return total_transmission
 
 
-# def fourier_transform(ifg_x, ifg_y):
-#     spectrum_y = np.fft.fft(ifg_y)
+def fourier_transform(ifg_x, ifg_y):
 
+    spectrum_y = np.fft.fft(ifg_y)
+    spectrum_x = np.fft.fftfreq(len(ifg_x), ifg_x[1] - ifg_x[0])
 
-#     plt.figure()
-#     plt.plot()
-
-#     plt.figure()
+    plt.figure()
+    plt.plot(spectrum_x, spectrum_y)
+    plt.show()
