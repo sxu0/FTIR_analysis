@@ -51,20 +51,35 @@ if __name__ == "__main__":
     except OSError:
         pass
 
+    overlay_plot_titles = ["air", "argon"]
     for i in range(len(single_beam_bkgd_files)):
         bkgd = single_beam_bkgd_files[i]
+        list_wavenumbers, list_transmission = [], []
+        overlay_plot_labels = []
         for j in range(len(single_beam_sample_files[i])):
-            wavenumbers, transmission = spectra.background_ratio(
-                single_beam_bkgd_files[i], single_beam_sample_files[i][j]
-            )
+            sample = single_beam_sample_files[i][j]
+            wavenumbers, transmission = spectra.background_ratio(bkgd, sample)
+            list_wavenumbers.append(wavenumbers)
+            list_transmission.append(transmission)
+            overlay_plot_labels.append(str(sample).split("_")[5])
             spectra.plot_spectrum(
                 wavenumbers,
                 transmission,
-                str(single_beam_sample_files[i][j].name)[17:-13],
-                "Wavenumber (cm^{-1})",
+                str(sample.name)[17:-13],
+                "Wavenumber (cm$^{-1}$)",
                 "% Transmission",
                 y_lim=(0, 1),
                 save_fig=True,
-                path_save=figure_path
-                / (str(single_beam_sample_files[i][j].name)[17:-12] + ".png"),
+                path_save=figure_path / (str(sample.name)[17:-12] + ".png"),
             )
+        spectra.overlay_spectra(
+            list_wavenumbers,
+            list_transmission,
+            overlay_plot_titles[i],
+            "Wavenumber (cm$^{-1}$)",
+            "% Transmission",
+            overlay_plot_labels,
+            y_lim=(0, 1),
+            save_fig=True,
+            path_save=figure_path / (overlay_plot_titles[i] + "_by_pressure.png"),
+        )

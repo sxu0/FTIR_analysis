@@ -109,6 +109,7 @@ def overlay_spectra(
     x_label,
     y_label,
     plot_labels,
+    y_lim=None,
     wavelength_convert=False,
     save_fig=False,
     path_save=None,
@@ -124,6 +125,8 @@ def overlay_spectra(
         y_label (str): Plot vertical axis label.
         plot_labels (List[str]): Legend for plot. Array-like object containing
             descriptor of each spectrum.
+        y_lim (Tuple(float, float), optional): Tuple containing min and max of
+            vertical axis in plot window. Defaults to None.
         wavelength_convert (bool, optional): Whether to convert wavenumber to
             wavelength units. Defaults to False.
         save_fig (bool, optional): Whether to save output figure. Defaults to False.
@@ -138,6 +141,7 @@ def overlay_spectra(
                 title,
                 x_label,
                 y_label,
+                y_lim=y_lim,
                 wavelength_convert=True,
                 hold_on=True,
             )
@@ -148,6 +152,7 @@ def overlay_spectra(
                 title,
                 x_label,
                 y_label,
+                y_lim=y_lim,
                 hold_on=True,
             )
     plt.legend(plot_labels)
