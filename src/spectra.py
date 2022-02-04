@@ -9,6 +9,7 @@ Author: Shiqi Xu
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy import integrate
 
 
 def wavelength_to_wavenumber(wavelengths):
@@ -155,7 +156,7 @@ def overlay_spectra(
                 y_lim=y_lim,
                 hold_on=True,
             )
-    plt.legend(plot_labels)
+    plt.legend(plot_labels, loc="upper right")
 
     plt.xlabel(x_label)
     plt.ylabel(y_label)
@@ -199,6 +200,36 @@ def background_ratio(
     transmission = joined_data.loc[:, "transmission"].to_numpy()
 
     return wavenumbers, transmission
+
+
+def tot_transmission(
+    wavenumber_data, transmission_data, min_wavenumber, max_wavenumber
+):
+    """Integrates to find total transmission over indicated spectral window.
+
+    Args:
+        wavenumber_data (numpy.array[float]): Array containing wavenumber data.
+        transmission_data (numpy.array[float]): Array containing % transmission data.
+        min_wavenumber (float): Lower wavenumber in spectral window.
+        max_wavenumber (float): Upper wavenumber in spectral window.
+
+    Returns:
+        total_transmission (float): Total % transmission (normalized) over
+            spectral window.
+    """
+    start = 0
+    while wavenumber_data[start] < min_wavenumber:
+        start += 1
+    end = start
+    while wavenumber_data[end] < max_wavenumber:
+        end += 1
+    wavenumber_cropped = wavenumber_data[start:end]
+    transmission_cropped = transmission_data[start:end]
+    total_transmission = integrate.trapz(transmission_cropped, wavenumber_cropped) / (
+        max_wavenumber - min_wavenumber
+    )
+
+    return total_transmission
 
 
 # def fourier_transform(ifg_x, ifg_y):
