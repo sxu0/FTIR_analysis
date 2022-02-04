@@ -9,6 +9,7 @@ Author: Shiqi Xu
 from pathlib import Path
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 import spectra
 
@@ -22,8 +23,6 @@ if __name__ == "__main__":
     for csv_file in data_path.iterdir():
         data_files.append(csv_file)
     data_files.sort()
-    # for i in range(len(data_files)):
-    #     print(data_files[i])
 
     single_beam_bkgd_files = []
     single_beam_sample_files = [[], []]
@@ -55,17 +54,17 @@ if __name__ == "__main__":
     except OSError:
         pass
 
-    overlay_plot_titles = ["air", "argon"]
+    sample_types = ["air", "argon"]
     for i in range(len(single_beam_bkgd_files)):
         bkgd = single_beam_bkgd_files[i]
         list_wavenumbers, list_transmission = [], []
-        overlay_plot_labels = []
+        pressure_labels = []
         for j in range(len(single_beam_sample_files[i])):
             sample = single_beam_sample_files[i][j]
             wavenumbers, transmission = spectra.background_ratio(bkgd, sample)
             list_wavenumbers.append(wavenumbers)
             list_transmission.append(transmission)
-            overlay_plot_labels.append(str(sample).split("_")[5])
+            pressure_labels.append(str(sample).split("_")[5])
             # spectra.plot_spectrum(
             #     wavenumbers,
             #     transmission,
@@ -79,13 +78,13 @@ if __name__ == "__main__":
         # spectra.overlay_spectra(
         #     list_wavenumbers,
         #     list_transmission,
-        #     overlay_plot_titles[i],
+        #     sample_types[i],
         #     "Wavenumber (cm$^{-1}$)",
         #     "% Transmission",
-        #     overlay_plot_labels,
+        #     pressure_labels,
         #     y_lim=(0, 1),
         #     save_fig=True,
-        #     path_save=figure_path / "bkgd_ratio" / (overlay_plot_titles[i] + "_by_pressure.png"),
+        #     path_save=figure_path / "bkgd_ratio" / (sample_types[i] + "_by_pressure.png"),
         # )
 
         ## CO2 absorption peak: 2200-2500 cm^{-1}
@@ -102,17 +101,34 @@ if __name__ == "__main__":
         # spectra.overlay_spectra(
         #     list_cropped_wavenumbers,
         #     list_cropped_transmission,
-        #     "CO$_2$ peak observed in " + overlay_plot_titles[i] + " sample",
+        #     "CO$_2$ peak observed in " + sample_types[i] + " sample",
         #     "Wavenumber (cm$^{-1}$)",
         #     "% Transmission",
-        #     overlay_plot_labels,
+        #     pressure_labels,
         #     y_lim=(0, 1),
         #     save_fig=True,
         #     path_save=figure_path
         #     / "co2_absorption"
-        #     / ("co2_peak_" + overlay_plot_titles[i] + "_by_pressure.png"),
+        #     / ("co2_peak_" + sample_types[i] + "_by_pressure.png"),
         # )
 
         ## integrating to get total transmission over 2280-2390 cm^{-1}
-        list_co2_transmission = []
+        list_pressures, list_co2_transmission = [], []
+        for j in range(len(list_cropped_wavenumbers)):
+            co2_transmission = spectra.tot_transmission(
+                list_cropped_wavenumbers[j],
+                list_cropped_transmission[j],
+                2280,
+                2390
+            )
+            list_co2_transmission.append(co2_transmission)
+            list_pressures.append(int(pressure_labels[j][:-3]))
+        # plt.figure()
+        # plt.plot(list_co2_transmission, list_pressures, "x")
+        # plt.title("% transmission over CO$_2$ peak in " + sample_types[i] + ", by pressure")
+        # plt.xlabel("Pressure (kPa)")
+        # plt.ylabel("% Transmission")
+        # plt.savefig(figure_path / "co2_absorption" / ("transmission_co2_peak_" + sample_types[i] + "_by_pressure.png"))
+        # plt.close()
+
 
