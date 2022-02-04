@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
     bkgd_wavenumbers, bkgd_intensity = spectra.read_data(data_files[0])
 
-    figure_path = Path.cwd() / "outputs" / "2021-01-21"
+    figure_path = Path.cwd() / "outputs" / "first_plots_2021-01-21"
     try:
         Path.mkdir(figure_path)
     except OSError:

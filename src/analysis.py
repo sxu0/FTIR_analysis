@@ -7,6 +7,7 @@ Author: Shiqi Xu
 """
 
 from pathlib import Path
+import re
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -73,7 +74,9 @@ if __name__ == "__main__":
             #     "% Transmission",
             #     y_lim=(0, 1),
             #     save_fig=True,
-            #     path_save=figure_path / "bkgd_ratio" / (str(sample.name)[17:-12] + ".png"),
+            #     path_save=figure_path
+            #     / "bkgd_ratio"
+            #     / (str(sample.name)[17:-13] + ".png"),
             # )
         # spectra.overlay_spectra(
         #     list_wavenumbers,
@@ -84,7 +87,9 @@ if __name__ == "__main__":
         #     pressure_labels,
         #     y_lim=(0, 1),
         #     save_fig=True,
-        #     path_save=figure_path / "bkgd_ratio" / (sample_types[i] + "_by_pressure.png"),
+        #     path_save=figure_path
+        #     / "bkgd_ratio"
+        #     / (sample_types[i] + "_by_pressure.png"),
         # )
 
         ## CO2 absorption peak: 2200-2500 cm^{-1}
@@ -116,19 +121,50 @@ if __name__ == "__main__":
         list_pressures, list_co2_transmission = [], []
         for j in range(len(list_cropped_wavenumbers)):
             co2_transmission = spectra.tot_transmission(
-                list_cropped_wavenumbers[j],
-                list_cropped_transmission[j],
-                2280,
-                2390
+                list_cropped_wavenumbers[j], list_cropped_transmission[j], 2280, 2390
             )
             list_co2_transmission.append(co2_transmission)
             list_pressures.append(int(pressure_labels[j][:-3]))
         # plt.figure()
-        # plt.plot(list_co2_transmission, list_pressures, "x")
-        # plt.title("% transmission over CO$_2$ peak in " + sample_types[i] + ", by pressure")
+        # plt.plot(list_pressures, list_co2_transmission, "x")
+        # plt.title(
+        #     "% transmission over CO$_2$ peak in " + sample_types[i] + ", by pressure"
+        # )
         # plt.xlabel("Pressure (kPa)")
         # plt.ylabel("% Transmission")
-        # plt.savefig(figure_path / "co2_absorption" / ("transmission_co2_peak_" + sample_types[i] + "_by_pressure.png"))
+        # plt.savefig(
+        #     figure_path
+        #     / "co2_absorption"
+        #     / ("transmission_co2_peak_" + sample_types[i] + "_by_pressure.png")
+        # )
         # plt.close()
 
-
+    ## exploring difference resolutions
+    res_filenames = [
+        "2022-01-21_run05_1.0res_argon_0kPa_sample.CSV",
+        "2022-01-21_run03_4.0res_argon_0kPa_sample.CSV",
+        "2022-01-21_run04_16.0res_argon_0kPa_sample.CSV",
+    ]
+    res_data_paths = [
+        Path.cwd() / "data" / "2022-01-21" / res_filenames[i]
+        for i in range(len(res_filenames))
+    ]
+    list_argon_wavenumbers, list_argon_intensities = [], []
+    for i in range(len(res_data_paths)):
+        argon_wavenumbers, argon_intensities = spectra.read_data(res_data_paths[i])
+        list_argon_wavenumbers.append(argon_wavenumbers)
+        list_argon_intensities.append(argon_intensities)
+    try:
+        Path.mkdir(figure_path / "resolution")
+    except OSError:
+        pass
+    # spectra.overlay_spectra(
+    #     list_argon_wavenumbers,
+    #     list_argon_intensities,
+    #     "Argon at 0 kPa, at different resolutions",
+    #     "Wavenumber (cm$^{-1}$)",
+    #     "Single-Beam Intensity (arbitrary units)",
+    #     ["1.0 resolution", "4.0 resolution", "16.0 resolution"],
+    #     save_fig=True,
+    #     path_save=figure_path / "resolution" / "argon_0kPa_by_resolution.png",
+    # )
