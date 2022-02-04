@@ -193,7 +193,7 @@ def background_ratio(
 
     joined_data = bkgd_data.join(sample_data, how="inner")
     joined_data["transmission"] = (
-        joined_data.loc[:, "sample"] / joined_data.loc[:, "background"]
+        joined_data.loc[:, "sample"] / joined_data.loc[:, "background"] * 100
     )
 
     wavenumbers = joined_data.index.to_numpy()

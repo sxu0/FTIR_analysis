@@ -66,31 +66,31 @@ if __name__ == "__main__":
             list_wavenumbers.append(wavenumbers)
             list_transmission.append(transmission)
             pressure_labels.append(str(sample).split("_")[5])
-            # spectra.plot_spectrum(
-            #     wavenumbers,
-            #     transmission,
-            #     str(sample.name)[17:-13],
-            #     "Wavenumber (cm$^{-1}$)",
-            #     "% Transmission",
-            #     y_lim=(0, 1),
-            #     save_fig=True,
-            #     path_save=figure_path
-            #     / "bkgd_ratio"
-            #     / (str(sample.name)[17:-13] + ".png"),
-            # )
-        # spectra.overlay_spectra(
-        #     list_wavenumbers,
-        #     list_transmission,
-        #     sample_types[i],
-        #     "Wavenumber (cm$^{-1}$)",
-        #     "% Transmission",
-        #     pressure_labels,
-        #     y_lim=(0, 1),
-        #     save_fig=True,
-        #     path_save=figure_path
-        #     / "bkgd_ratio"
-        #     / (sample_types[i] + "_by_pressure.png"),
-        # )
+            spectra.plot_spectrum(
+                wavenumbers,
+                transmission,
+                str(sample.name)[17:-13],
+                "Wavenumber (cm$^{-1}$)",
+                "% Transmission",
+                y_lim=(0, 100),
+                save_fig=True,
+                path_save=figure_path
+                / "bkgd_ratio"
+                / (str(sample.name)[17:-13] + ".png"),
+            )
+        spectra.overlay_spectra(
+            list_wavenumbers,
+            list_transmission,
+            sample_types[i],
+            "Wavenumber (cm$^{-1}$)",
+            "% Transmission",
+            pressure_labels,
+            y_lim=(0, 100),
+            save_fig=True,
+            path_save=figure_path
+            / "bkgd_ratio"
+            / (sample_types[i] + "_by_pressure.png"),
+        )
 
         ## CO2 absorption peak: 2200-2500 cm^{-1}
         list_cropped_wavenumbers, list_cropped_transmission = [], []
@@ -103,19 +103,19 @@ if __name__ == "__main__":
                 end += 1
             list_cropped_wavenumbers.append(list_wavenumbers[j][start:end])
             list_cropped_transmission.append(list_transmission[j][start:end])
-        # spectra.overlay_spectra(
-        #     list_cropped_wavenumbers,
-        #     list_cropped_transmission,
-        #     "CO$_2$ peak observed in " + sample_types[i] + " sample",
-        #     "Wavenumber (cm$^{-1}$)",
-        #     "% Transmission",
-        #     pressure_labels,
-        #     y_lim=(0, 1),
-        #     save_fig=True,
-        #     path_save=figure_path
-        #     / "co2_absorption"
-        #     / ("co2_peak_" + sample_types[i] + "_by_pressure.png"),
-        # )
+        spectra.overlay_spectra(
+            list_cropped_wavenumbers,
+            list_cropped_transmission,
+            "CO$_2$ peak observed in " + sample_types[i] + " sample",
+            "Wavenumber (cm$^{-1}$)",
+            "% Transmission",
+            pressure_labels,
+            y_lim=(0, 100),
+            save_fig=True,
+            path_save=figure_path
+            / "co2_absorption"
+            / ("co2_peak_" + sample_types[i] + "_by_pressure.png"),
+        )
 
         ## integrating to get total transmission over 2280-2390 cm^{-1}
         list_pressures, list_co2_transmission = [], []
@@ -125,19 +125,19 @@ if __name__ == "__main__":
             )
             list_co2_transmission.append(co2_transmission)
             list_pressures.append(int(pressure_labels[j][:-3]))
-        # plt.figure()
-        # plt.plot(list_pressures, list_co2_transmission, "x")
-        # plt.title(
-        #     "% transmission over CO$_2$ peak in " + sample_types[i] + ", by pressure"
-        # )
-        # plt.xlabel("Pressure (kPa)")
-        # plt.ylabel("% Transmission")
-        # plt.savefig(
-        #     figure_path
-        #     / "co2_absorption"
-        #     / ("transmission_co2_peak_" + sample_types[i] + "_by_pressure.png")
-        # )
-        # plt.close()
+        plt.figure()
+        plt.plot(list_pressures, list_co2_transmission, "x")
+        plt.title(
+            "% transmission over CO$_2$ peak in " + sample_types[i] + ", by pressure"
+        )
+        plt.xlabel("Pressure (kPa)")
+        plt.ylabel("% Transmission")
+        plt.savefig(
+            figure_path
+            / "co2_absorption"
+            / ("transmission_co2_peak_" + sample_types[i] + "_by_pressure.png")
+        )
+        plt.close()
 
     ## exploring difference resolutions
     res_filenames = [
