@@ -144,7 +144,7 @@ if __name__ == "__main__":
         )
         plt.close()
 
-    ## exploring difference resolutions
+    ## exploring different resolutions
     res_filenames = [
         "2022-01-21_run05_1.0res_argon_0kPa_sample.CSV",
         "2022-01-21_run03_4.0res_argon_0kPa_sample.CSV",
