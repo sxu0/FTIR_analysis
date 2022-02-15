@@ -1,7 +1,10 @@
 """
 snr.py
 
+Plots the noise from spectra containing varying numbers of scan counts, averaged.
+Signal is omitted as it remains constant throughout this dataset.
 
+Standalone script.
 """
 
 from pathlib import Path
@@ -18,34 +21,40 @@ df_noise = pd.DataFrame({"no_scans": no_scans, "peak_to_peak": peak_to_peak_nois
 df_noise.set_index("no_scans", inplace=True)
 # print(df_noise)
 
-# path_save = Path.cwd() / "outputs" / "snr"
-# try:
-#     Path.mkdir(path_save)
-# except:
-
+path_save = Path.cwd() / "outputs" / "snr"
+try:
+    Path.mkdir(path_save)
+except OSError:
+    pass
 
 plt.figure()
 plt.plot(no_scans, peak_to_peak_noise, ".", label="peak to peak")
 plt.title("Peak-to-Peak Noise in 2603-2398 cm$^{-1}$ Region")
 plt.xlabel("No. of Averaged Scans")
 plt.ylabel("Peak-to-Peak Noise (arbitrary single beam units)")
+fig_name = "p2p_noise_vs_scan_count.png"
+plt.savefig(path_save / fig_name)
 
 plt.figure()
 plt.plot(no_scans, rms_noise, ".", label="RMS")
 plt.title("RMS Noise in 2603-2398 cm$^{-1}$ Region")
 plt.xlabel("No. of Averaged Scans")
 plt.ylabel("RMS Noise (arbitrary single beam units)")
+fig_name = "rms_noise_vs_scan_count.png"
+plt.savefig(path_save / fig_name)
 
 plt.figure()
 plt.plot(no_scans_log2, peak_to_peak_noise, ".", label="peak to peak")
 plt.title("Peak-to-Peak Noise in 2603-2398 cm$^{-1}$ Region")
 plt.xlabel("log$_2$(No. of Averaged Scans)")
 plt.ylabel("Peak-to-Peak Noise (arbitrary single beam units)")
+fig_name = "log_p2p_noise_vs_scan_count.png"
+plt.savefig(path_save / fig_name)
 
 plt.figure()
 plt.plot(no_scans_log2, rms_noise, ".", label="RMS")
 plt.title("RMS Noise in 2603-2398 cm$^{-1}$ Region")
 plt.xlabel("log$_2$(No. of Averaged Scans)")
 plt.ylabel("RMS Noise (arbitrary single beam units)")
-
-plt.show()
+fig_name = "log_rms_noise_vs_scan_count.png"
+plt.savefig(path_save / fig_name)
