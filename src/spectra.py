@@ -16,10 +16,10 @@ def wavelength_to_wavenumber(wavelengths):
     """Converts wavelengths (nm) to wavenumbers (cm^{-1}).
 
     Args:
-        wavelengths (numpy.array[float]): Array of wavelengths, in nm.
+        wavelengths (np.ndarray[float]): Array of wavelengths, in nm.
 
     Returns:
-        wavenumbers (numpy.array[float]): Array of wavenumbers, in cm^{-1}.
+        wavenumbers (np.ndarray[float]): Array of wavenumbers, in cm^{-1}.
     """
     wavenumbers = 1e7 / wavelengths
     return wavenumbers
@@ -29,10 +29,10 @@ def wavenumber_to_wavelength(wavenumbers):
     """Converts wavenumbers (cm^{-1}) to wavelengths (nm).
 
     Args:
-        wavenumbers (numpy.array[float]): Array of wavenumbers, in cm^{-1}.
+        wavenumbers (np.ndarray[float]): Array of wavenumbers, in cm^{-1}.
 
     Returns:
-        wavelengths (numpy.array[float]): Array of wavelengths, in nm.
+        wavelengths (np.ndarray[float]): Array of wavelengths, in nm.
     """
     wavelengths = 1e7 / wavenumbers
     return wavelengths
@@ -45,8 +45,8 @@ def read_data(path_csv):
         path_csv (pathlib.Path): Path to CSV file containing data.
 
     Returns:
-        x_data (numpy.array[float]): Array containing independent variable data.
-        y_data (numpy.array[float]): Array containing dependent variable data.
+        x_data (np.ndarray[float]): Array containing independent variable data.
+        y_data (np.ndarray[float]): Array containing dependent variable data.
     """
     data = pd.read_csv(path_csv, header=None)
     x_data = data.iloc[:, 0].to_numpy()
@@ -70,8 +70,8 @@ def plot_spectrum(
     """Plots the input spectrum.
 
     Args:
-        wavenumber_data (numpy.array[float]): Array containing wavenumber data.
-        y_data (numpy.array[float]): Array containing dependent variable data.
+        wavenumber_data (np.ndarray[float]): Array containing wavenumber data.
+        y_data (np.ndarray[float]): Array containing dependent variable data.
         title (str): Plot title.
         x_label (str): Plot horizontal axis label.
         y_label (str): Plot vertical axis label.
@@ -180,8 +180,8 @@ def background_ratio(
         sample_path_csv (pathlib.Path): Path to CSV file containing sample data.
 
     Returns:
-        wavenumbers (numpy.array[float]): Array containing wavenumber data.
-        transmission (numpy.array[float]): Array containing % transmission data.
+        wavenumbers (np.ndarray[float]): Array containing wavenumber data.
+        transmission (np.ndarray[float]): Array containing % transmission data.
     """
     bkgd_data = pd.read_csv(bkgd_path_csv, header=None)
     bkgd_data.set_index(0, inplace=True)
@@ -208,8 +208,8 @@ def tot_transmission(
     """Integrates to find total transmission over indicated spectral window.
 
     Args:
-        wavenumber_data (numpy.array[float]): Array containing wavenumber data.
-        transmission_data (numpy.array[float]): Array containing % transmission data.
+        wavenumber_data (np.ndarray[float]): Array containing wavenumber data.
+        transmission_data (np.ndarray[float]): Array containing % transmission data.
         min_wavenumber (float): Lower wavenumber in spectral window.
         max_wavenumber (float): Upper wavenumber in spectral window.
 
@@ -234,8 +234,15 @@ def tot_transmission(
 
 def fourier_transform(ifg_x, ifg_y):
 
-    spectrum_y = np.fft.fft(ifg_y)
-    spectrum_x = np.fft.fftfreq(len(ifg_x), ifg_x[1] - ifg_x[0])
+    # spectrum_y = np.fft.fft(ifg_y)  # squaring does not get rid of bottom reflected part
+    # # spectrum_x = np.fft.fftfreq(len(ifg_x), ifg_x[1] - ifg_x[0])
+    # spectrum_x = np.fft.fftfreq(len(ifg_x), 0.241)
+    # spectrum_y = np.fft.rfft(ifg_y)  # squaring does not get rid of bottom reflected part
+    # # spectrum_x = np.fft.rfftfreq(len(ifg_x), ifg_x[1] - ifg_x[0])
+    # spectrum_x = np.fft.rfftfreq(len(ifg_x), 0.241)
+    spectrum_y = np.fft.hfft(ifg_y)[:len(ifg_y)] ** 2
+    # spectrum_x = np.fft.fftfreq(2 * len(ifg_x), ifg_x[1] - ifg_x[0])[:len(ifg_x)]
+    spectrum_x = np.fft.fftfreq(2 * len(ifg_x), 0.241)[:len(ifg_x)]
 
     plt.figure()
     plt.plot(spectrum_x, spectrum_y)
