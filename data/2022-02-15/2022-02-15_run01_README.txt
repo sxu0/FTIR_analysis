@@ -1,0 +1,2 @@
+2022-02-15_run01_4.0res_2scans_evac_-95kPa missing because I deleted it from OMNIC by accident without saving it
+so no background collected for that round of evacuating gas cell to -95 kPa
