@@ -306,28 +306,16 @@ def fourier_transform(ifg_x, ifg_y, plot=False, save_fig=False, path_save=None):
         if (spectrum_y_filtered[i] - spectrum_y_filtered[i-1] < 0) and (spectrum_y_filtered[i] - spectrum_y_filtered[i+1] > 0):
             x_troughs.append(spectrum_x_filtered[i])
             y_troughs.append(spectrum_y_filtered[i])
-        
-    spectrum_x_envelope = np.array(spectrum_x_envelope)
+    y_troughs_interp = np.interp(x_peaks, x_troughs, y_troughs)
+    for i in range(len(x_peaks)):
+        spectrum_y_envelope.append(max(y_peaks[i], y_troughs_interp[i]))
     spectrum_y_envelope = np.array(spectrum_y_envelope)
+    spectrum_x_envelope = np.array(x_peaks)
 
     if plot:
         plot_spectrum(
-            # spectrum_x_filtered,
-            # spectrum_y_filtered,
-            # spectrum_x_envelope,
-            # spectrum_y_envelope,
-            x_peaks,
-            y_peaks,
-            "Single-Beam Spectrum, FFT'd from Interferogram",
-            "Wavenumber (cm$^{-1}$)",
-            "Single-Beam Intensity (arbitrary units)",
-            hold_on=True,
-            save_fig=save_fig,
-            path_save=path_save,
-        )
-        plot_spectrum(
-            x_troughs,
-            y_troughs,
+            spectrum_x_envelope,
+            spectrum_y_envelope,
             "Single-Beam Spectrum, FFT'd from Interferogram",
             "Wavenumber (cm$^{-1}$)",
             "Single-Beam Intensity (arbitrary units)",
