@@ -17,4 +17,4 @@ if __name__ == "__main__":
         / "2022-01-25_run00_2.0res_evac_-93kPa_sample_ifg.CSV"
     )
     data_points, voltage = spectra.read_data(ifg_path)
-    spectra.fourier_transform(data_points, voltage, plot=True)
+    spectra.fourier_transform(data_points, voltage, 0.241, plot=True)

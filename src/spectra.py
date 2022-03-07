@@ -6,6 +6,9 @@ Functions for manipulating and analysing FTIR spectra.
 Author: Shiqi Xu
 """
 
+from pathlib import Path
+from typing import Tuple, Union
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -232,12 +235,19 @@ def tot_transmission(
     return total_transmission
 
 
-def fourier_transform(ifg_x, ifg_y, plot=False, save_fig=False, path_save=None):
+def fourier_transform(
+    ifg_x: np.ndarray,
+    ifg_y: np.ndarray,
+    wavenumber_res: float,
+    plot: bool = False,
+    save_fig: bool = False,
+    path_save: Union[str, Path] = None
+    ) -> Tuple[np.ndarray, np.ndarray]:
     """Performs the Fourier transform on an input interferogram to output a
     single-beam spectrum. Optionally generates a plot of the single-beam spectrum.
 
     Args:
-        ifg_x (np.ndarray[int]): Interferogram independent variable data, in units of
+        ifg_x (np.ndarray[float]): Interferogram independent variable data, in units of
             "data points" (i.e. time-domain spacing to be deduced).
         ifg_y (np.ndarray[float]): Interferogram intensity data, in units of Volts.
         plot (bool, optional): Whether to generate a plot. Defaults to False.
@@ -245,10 +255,8 @@ def fourier_transform(ifg_x, ifg_y, plot=False, save_fig=False, path_save=None):
         path_save (str, optional): Path to save output figure. Defaults to None.
 
     Returns:
-        spectrum_x_filtered (np.ndarray[float]): Array containing wavenumber data,
-            in cm^{-1}.
-        spectrum_y_filtered (np.ndarray[float]): Array containing single-beam intensity
-            data, in arbitrary units.
+        Tuple[np.ndarray[float], np.ndarray[float]]: Arrays containing wavenumber data
+            in cm^{-1}, and single-beam intensity data, in arbitrary units.
     """
 
     '''Failed tries.
@@ -272,7 +280,7 @@ def fourier_transform(ifg_x, ifg_y, plot=False, save_fig=False, path_save=None):
     '''
 
     spectrum_y = np.fft.hfft(ifg_y)[:len(ifg_y)]
-    spectrum_x = np.fft.fftshift(np.fft.fftfreq(len(ifg_x), 1/0.241/len(ifg_x)))
+    spectrum_x = np.fft.fftshift(np.fft.fftfreq(len(ifg_x), 1/wavenumber_res/len(ifg_x)))
     spectrum_x += spectrum_x[-1]
 
     start = 0
