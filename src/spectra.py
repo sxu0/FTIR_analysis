@@ -292,13 +292,42 @@ def fourier_transform(ifg_x, ifg_y, plot=False, save_fig=False, path_save=None):
     # spectrum_x_filtered = np.delete(spectrum_x_cropped, del_i)
     # spectrum_y_filtered = np.delete(spectrum_y_cropped, del_i)
 
-    spectrum_x_filtered = np.abs(spectrum_x_cropped)
+    spectrum_x_filtered = spectrum_x_cropped
     spectrum_y_filtered = np.abs(spectrum_y_cropped)
+
+    ## take upper envelope
+    spectrum_x_envelope, spectrum_y_envelope = [], []
+    x_peaks, y_peaks = [], []
+    x_troughs, y_troughs = [], []
+    for i in range(1, len(spectrum_x_filtered)-1):
+        if (spectrum_y_filtered[i] - spectrum_y_filtered[i-1] > 0) and (spectrum_y_filtered[i] - spectrum_y_filtered[i+1] < 0):
+            x_peaks.append(spectrum_x_filtered[i])
+            y_peaks.append(spectrum_y_filtered[i])
+        if (spectrum_y_filtered[i] - spectrum_y_filtered[i-1] < 0) and (spectrum_y_filtered[i] - spectrum_y_filtered[i+1] > 0):
+            x_troughs.append(spectrum_x_filtered[i])
+            y_troughs.append(spectrum_y_filtered[i])
+        
+    spectrum_x_envelope = np.array(spectrum_x_envelope)
+    spectrum_y_envelope = np.array(spectrum_y_envelope)
 
     if plot:
         plot_spectrum(
-            spectrum_x_filtered,
-            spectrum_y_filtered,
+            # spectrum_x_filtered,
+            # spectrum_y_filtered,
+            # spectrum_x_envelope,
+            # spectrum_y_envelope,
+            x_peaks,
+            y_peaks,
+            "Single-Beam Spectrum, FFT'd from Interferogram",
+            "Wavenumber (cm$^{-1}$)",
+            "Single-Beam Intensity (arbitrary units)",
+            hold_on=True,
+            save_fig=save_fig,
+            path_save=path_save,
+        )
+        plot_spectrum(
+            x_troughs,
+            y_troughs,
             "Single-Beam Spectrum, FFT'd from Interferogram",
             "Wavenumber (cm$^{-1}$)",
             "Single-Beam Intensity (arbitrary units)",
