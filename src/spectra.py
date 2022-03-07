@@ -61,6 +61,7 @@ def plot_spectrum(
     title,
     x_label,
     y_label,
+    x_inv=False,
     y_lim=None,
     wavelength_convert=False,
     save_fig=False,
@@ -75,6 +76,8 @@ def plot_spectrum(
         title (str): Plot title.
         x_label (str): Plot horizontal axis label.
         y_label (str): Plot vertical axis label.
+        x_inv (bool, optional): Whether to invert the x-axis such that x-values
+            decrease towards the right.
         y_lim (Tuple(float, float), optional): Tuple containing min and max of
             vertical axis in plot window. Defaults to None.
         wavelength_convert (bool, optional): Whether to convert wavenumber to
@@ -88,6 +91,10 @@ def plot_spectrum(
 
     # plt.figure()
     plt.plot(wavenumber_data, y_data)
+
+    if x_inv:
+        plt.gca().invert_xaxis()
+
     if y_lim is not None:
         plt.ylim(y_lim)
 
@@ -110,6 +117,7 @@ def overlay_spectra(
     x_label,
     y_label,
     plot_labels,
+    x_inv=False,
     y_lim=None,
     wavelength_convert=False,
     save_fig=False,
@@ -126,6 +134,8 @@ def overlay_spectra(
         y_label (str): Plot vertical axis label.
         plot_labels (List[str]): Legend for plot. Array-like object containing
             descriptor of each spectrum.
+        x_inv (bool, optional): Whether to invert the x-axis such that x-values
+            decrease towards the right.
         y_lim (Tuple(float, float), optional): Tuple containing min and max of
             vertical axis in plot window. Defaults to None.
         wavelength_convert (bool, optional): Whether to convert wavenumber to
@@ -135,27 +145,17 @@ def overlay_spectra(
     """
     plt.figure()
     for i in range(len(list_wavenumber_data)):
-        if wavelength_convert:
-            plot_spectrum(
-                list_wavenumber_data[i],
-                list_y_data[i],
-                title,
-                x_label,
-                y_label,
-                y_lim=y_lim,
-                wavelength_convert=True,
-                hold_on=True,
-            )
-        else:
-            plot_spectrum(
-                list_wavenumber_data[i],
-                list_y_data[i],
-                title,
-                x_label,
-                y_label,
-                y_lim=y_lim,
-                hold_on=True,
-            )
+        plot_spectrum(
+            list_wavenumber_data[i],
+            list_y_data[i],
+            title,
+            x_label,
+            y_label,
+            x_inv=x_inv,
+            y_lim=y_lim,
+            wavelength_convert=wavelength_convert,
+            hold_on=True,
+        )
     plt.legend(plot_labels, loc="upper right")
 
     plt.xlabel(x_label)
@@ -319,6 +319,7 @@ def fourier_transform(ifg_x, ifg_y, plot=False, save_fig=False, path_save=None):
             "Single-Beam Spectrum, FFT'd from Interferogram",
             "Wavenumber (cm$^{-1}$)",
             "Single-Beam Intensity (arbitrary units)",
+            x_inv=True,
             save_fig=save_fig,
             path_save=path_save,
         )
