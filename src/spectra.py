@@ -232,26 +232,78 @@ def tot_transmission(
     return total_transmission
 
 
-def fourier_transform(ifg_x, ifg_y):
+def fourier_transform(ifg_x, ifg_y, plot=False, save_fig=False, path_save=None):
+    """Performs the Fourier transform on an input interferogram to output a
+    single-beam spectrum. Optionally generates a plot of the single-beam spectrum.
 
-    # spectrum_y = np.fft.fft(ifg_y)  # squaring does not get rid of bottom reflected part
-    # spectrum_x = np.fft.fftfreq(len(ifg_x), ifg_x[1] - ifg_x[0])
+    Args:
+        ifg_x (np.ndarray[int]): Interferogram independent variable data, in units of
+            "data points" (i.e. time-domain spacing to be deduced).
+        ifg_y (np.ndarray[float]): Interferogram intensity data, in units of Volts.
+        plot (bool, optional): Whether to generate a plot. Defaults to False.
+        save_fig (bool, optional): Whether to save output figure. Defaults to False.
+        path_save (str, optional): Path to save output figure. Defaults to None.
 
-    # spectrum_y = np.fft.rfft(ifg_y)  # squaring does not get rid of bottom reflected part
-    # spectrum_x = np.fft.rfftfreq(len(ifg_x), ifg_x[1] - ifg_x[0])
+    Returns:
+        spectrum_x_filtered (np.ndarray[float]): Array containing wavenumber data,
+            in cm^{-1}.
+        spectrum_y_filtered (np.ndarray[float]): Array containing single-beam intensity
+            data, in arbitrary units.
+    """
 
-    # spectrum_y = np.fft.hfft(ifg_y)[:len(ifg_y)] ** 2
-    # spectrum_x = np.fft.fftfreq(2 * len(ifg_x), ifg_x[1] - ifg_x[0])[:len(ifg_x)]
+    '''Failed tries.
+    spectrum_y = np.fft.fft(ifg_y)  # squaring does not get rid of bottom reflected part
+    spectrum_x = np.fft.fftfreq(len(ifg_x), ifg_x[1] - ifg_x[0])
 
-    # spectrum_y = np.fft.fft(ifg_y)  # squaring does not get rid of bottom reflected part
-    # spectrum_x = np.fft.fftfreq(len(ifg_x), 0.241)
-
-    # spectrum_y = np.fft.rfft(ifg_y)  # squaring does not get rid of bottom reflected part
-    # spectrum_x = np.fft.rfftfreq(len(ifg_x), 0.241)
+    spectrum_y = np.fft.rfft(ifg_y)  # squaring does not get rid of bottom reflected part
+    spectrum_x = np.fft.rfftfreq(len(ifg_x), ifg_x[1] - ifg_x[0])
 
     spectrum_y = np.fft.hfft(ifg_y)[:len(ifg_y)] ** 2
-    spectrum_x = np.fft.fftfreq(2 * len(ifg_x), 0.241)[:len(ifg_x)]
+    spectrum_x = np.fft.fftfreq(2 * len(ifg_x), ifg_x[1] - ifg_x[0])[:len(ifg_x)]
 
-    plt.figure()
-    plt.plot(spectrum_x, spectrum_y)
-    plt.show()
+    spectrum_y = np.fft.fft(ifg_y)  # squaring does not get rid of bottom reflected part
+    spectrum_x = np.fft.fftfreq(len(ifg_x), 0.241)
+
+    spectrum_y = np.fft.rfft(ifg_y)  # squaring does not get rid of bottom reflected part
+    spectrum_x = np.fft.rfftfreq(len(ifg_x), 0.241)
+
+    spectrum_y = np.fft.hfft(ifg_y)[:len(ifg_y)]
+    spectrum_x = np.fft.fftfreq(2 * len(ifg_x), 1/4000)[:len(ifg_x)]
+    '''
+
+    spectrum_y = np.fft.hfft(ifg_y)[:len(ifg_y)]
+    spectrum_x = np.fft.fftshift(np.fft.fftfreq(len(ifg_x), 1/0.241/len(ifg_x)))
+    spectrum_x += spectrum_x[-1]
+
+    start = 0
+    while spectrum_x[start] < 400:
+        start += 1
+    end = start
+    while spectrum_x[end] < 4000:
+        end += 1
+    spectrum_x_cropped = spectrum_x[start:end]
+    spectrum_y_cropped = spectrum_y[start:end]
+
+    # ## filter out negative component
+    # del_i = []
+    # for i in range(len(spectrum_x_cropped)):
+    #     if spectrum_y_cropped[i] < 0:
+    #         del_i.append(i)
+    # spectrum_x_filtered = np.delete(spectrum_x_cropped, del_i)
+    # spectrum_y_filtered = np.delete(spectrum_y_cropped, del_i)
+
+    spectrum_x_filtered = np.abs(spectrum_x_cropped)
+    spectrum_y_filtered = np.abs(spectrum_y_cropped)
+
+    if plot:
+        plot_spectrum(
+            spectrum_x_filtered,
+            spectrum_y_filtered,
+            "Single-Beam Spectrum, FFT'd from Interferogram",
+            "Wavenumber (cm$^{-1}$)",
+            "Single-Beam Intensity (arbitrary units)",
+            save_fig=save_fig,
+            path_save=path_save,
+        )
+
+    return spectrum_x_filtered, spectrum_y_filtered
