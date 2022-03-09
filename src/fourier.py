@@ -20,8 +20,13 @@ if __name__ == "__main__":
         "2022-01-25_run07_2.0res_air_-40kPa_sample_ifg.CSV"
         ]
 
-    # for i in range(len(sample_ifgs_220125)):
-    for i in range(1):
+    output_path = Path.cwd() / "outputs" / "fourier_transform"
+    try:
+        Path.mkdir(output_path)
+    except OSError:
+        pass
+
+    for i in range(len(sample_ifgs_220125)):
         ifg_path = (
             Path.cwd()
             / "data"
@@ -29,4 +34,12 @@ if __name__ == "__main__":
             / sample_ifgs_220125[i]
         )
         data_points, voltage = spectra.read_data(ifg_path)
-        spectra.fourier_transform(data_points, voltage, 0.241, plot=True)
+        fig_name = "_".join(sample_ifgs_220125[i].split("_")[:5]) + "_fft_spectrum.png"
+        wavenumbers, intensity = spectra.fourier_transform(
+            data_points,
+            voltage,
+            0.241,
+            plot = True,
+            save_fig = True,
+            path_save = output_path / fig_name,
+        )
