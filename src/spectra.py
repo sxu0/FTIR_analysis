@@ -93,7 +93,7 @@ def plot_spectrum(
         wavenumber_data = wavenumber_to_wavelength(wavenumber_data)
 
     # plt.figure()
-    plt.plot(wavenumber_data, y_data)
+    plt.plot(wavenumber_data, y_data, linewidth=0.75)
 
     if x_inv:
         plt.gca().invert_xaxis()
