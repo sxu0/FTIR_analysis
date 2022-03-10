@@ -265,37 +265,6 @@ def fourier_transform(
         Tuple[np.ndarray[float], np.ndarray[float]]: Arrays containing wavenumber data
             in cm^{-1}, and single-beam intensity data, in arbitrary units.
     """
-
-    '''Failed tries.
-    # spectrum_y = np.fft.fft(ifg_y)  # squaring does not get rid of bottom reflected part
-    # spectrum_x = np.fft.fftfreq(len(ifg_x), ifg_x[1] - ifg_x[0])
-
-    # spectrum_y = np.fft.rfft(ifg_y)  # squaring does not get rid of bottom reflected part
-    # spectrum_x = np.fft.rfftfreq(len(ifg_x), ifg_x[1] - ifg_x[0])
-
-    # spectrum_y = np.fft.hfft(ifg_y)[:len(ifg_y)]
-    # spectrum_x = np.fft.fftfreq(2 * len(ifg_x), ifg_x[1] - ifg_x[0])[:len(ifg_x)]
-
-    # spectrum_y = np.fft.hfft(ifg_y)[:len(ifg_y)] ** 2
-    # spectrum_x = np.fft.fftfreq(2 * len(ifg_x), ifg_x[1] - ifg_x[0])[:len(ifg_x)]
-
-    # spectrum_y = np.fft.fft(ifg_y)  # squaring does not get rid of bottom reflected part
-    # spectrum_x = np.fft.fftfreq(len(ifg_x), 0.241)
-
-    # spectrum_y = np.fft.rfft(ifg_y)  # squaring does not get rid of bottom reflected part
-    # spectrum_x = np.fft.rfftfreq(len(ifg_x), 0.241)
-
-    # spectrum_y = np.fft.hfft(ifg_y)[:len(ifg_y)]
-    # spectrum_x = np.fft.fftfreq(2 * len(ifg_x), 1/4000)[:len(ifg_x)]
-
-    spectrum_y = np.fft.hfft(ifg_y)[:len(ifg_y)]
-    spectrum_x = np.fft.fftfreq(len(ifg_x), 1/wavenumber_res/len(ifg_x))
-    # spectrum_x = np.fft.fftshift(np.fft.fftfreq(len(ifg_x), 1/wavenumber_res/len(ifg_x)))  # fftshift not needed
-
-    plt.plot(spectrum_x, spectrum_y)
-    plt.show()
-    '''
-
     spectrum_y = np.fft.hfft(ifg_y)[:len(ifg_y)]
     spectrum_x = np.fft.fftfreq(len(ifg_x), 1/wavenumber_res/len(ifg_x))
 
