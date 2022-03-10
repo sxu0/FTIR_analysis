@@ -337,7 +337,7 @@ def fourier_transform(
                 "Single-Beam Spectrum, FFT'd from Interferogram",
                 "Wavenumber (cm$^{-1}$)",
                 "Single-Beam Intensity (arbitrary units)",
-                ["from software", "from FFT"],
+                ["reference", "from FFT"],
                 x_inv=True,
                 save_fig=save_fig,
                 path_save=path_save,
