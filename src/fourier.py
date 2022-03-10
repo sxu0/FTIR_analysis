@@ -26,19 +26,30 @@ if __name__ == "__main__":
     except OSError:
         pass
 
+    ref_spectra_path = Path.cwd() / "data" / "2022-01-25"
+    ref_spectra_files = []
+    for csv_file in ref_spectra_path.iterdir():
+        if str(csv_file.name).split("_")[5][:8] == "spectrum":
+            ref_spectra_files.append(csv_file)
+    ref_spectra_files.sort()
+
     for i in range(len(sample_ifgs_220125)):
+    # for i in range(1):
         ifg_path = (
             Path.cwd()
             / "data"
             / "2022-01-25"
             / sample_ifgs_220125[i]
         )
+        ref_x, ref_y = spectra.read_data(ref_spectra_files[i])
         data_points, voltage = spectra.read_data(ifg_path)
         fig_name = "_".join(sample_ifgs_220125[i].split("_")[:5]) + "_fft_spectrum.png"
         wavenumbers, intensity = spectra.fourier_transform(
             data_points,
             voltage,
             0.241,
+            ref_spectrum_x = ref_x,
+            ref_spectrum_y = 0.9 * ref_y,
             plot = True,
             save_fig = True,
             path_save = output_path / fig_name,
