@@ -92,7 +92,6 @@ def plot_spectrum(
     if wavelength_convert:
         wavenumber_data = wavenumber_to_wavelength(wavenumber_data)
 
-    # plt.figure()
     plt.plot(wavenumber_data, y_data, linewidth=0.75)
 
     if x_inv:
@@ -309,14 +308,7 @@ def fourier_transform(
     spectrum_x_cropped = spectrum_x[start:end]
     spectrum_y_cropped = spectrum_y[start:end]
 
-    # ## filter out negative component
-    # del_i = []
-    # for i in range(len(spectrum_x_cropped)):
-    #     if spectrum_y_cropped[i] < 0:
-    #         del_i.append(i)
-    # spectrum_x_filtered = np.delete(spectrum_x_cropped, del_i)
-    # spectrum_y_filtered = np.delete(spectrum_y_cropped, del_i)
-
+    ## fold negative-intensity component over the x-axis
     spectrum_x_filtered = spectrum_x_cropped
     spectrum_y_filtered = np.abs(spectrum_y_cropped)
 
