@@ -57,6 +57,24 @@ def fit_bkgd(x_data, y_data, func, guess):
     return fitted, err_cov
 
 
+def absorption(x_data, y_data, fitted_params):
+    y_fitted = parabola(x_data, fitted_params[0], fitted_params[1], fitted_params[2])
+    y_diff = y_fitted - y_data
+    x_int, y_int = [], []
+    for i in range(len(x_data)):
+        if y_diff[i] > 0:
+            x_int.append(x_data[i])
+            y_int.append(y_diff[i])
+    # plt.figure()
+    # plt.plot(x_int, y_int)
+    # plt.show()
+    absorbed_radiation = integrate.trapezoid(y_int, x_int)
+    tot_radiation = integrate.trapezoid(y_fitted, x_data)
+    absorp = absorbed_radiation / tot_radiation * 100
+
+    return absorp
+
+
 if __name__ == "__main__":
 
     data_path = Path.cwd() / "data" / "2022-02-15"
@@ -78,8 +96,8 @@ if __name__ == "__main__":
     except:
         pass
 
-    # for i in range(len(data_files)):
-    for i in range(1):
+    for i in range(len(data_files)):
+    # for i in range(1):
         x_data, y_data = spectra.read_data(data_files[i])
         x_range = [1970, 2140]
         x_cropped, y_cropped = crop_spectrum(x_range[0], x_range[1], x_data, y_data)
@@ -96,18 +114,21 @@ if __name__ == "__main__":
         # )
         yy_fit = parabola(xx_fit, bkgd_params[0], bkgd_params[1], bkgd_params[2])
 
-        plt.figure()
+        absorp = absorption(x_top, y_top, bkgd_params)
+        # print("absorption: " + str(absorp) + "%")
+
+        fig = plt.figure()
         plt.plot(x_cropped, y_cropped, 'x', label="data")
         plt.plot(x_top, y_top, '.', label="peaks")
         plt.plot(xx_fit, yy_fit, label="fit")
         plt.gca().invert_xaxis()
-        plt.legend()
+        plt.legend(loc="center left")
         plt.title("Background Fit for 2022-02-15_run02_" + str(data_files[i].name).split("_")[-1][:-4])
         plt.xlabel("Wavenumber (cm$^{-1}$)")
         plt.ylabel("Intensity (arbitrary units)")
+        plt.text(200, 100, "absorption: " + str(round(absorp, 4)) + "%", ha='center', va='center', transform=None)
+
         # plt.show()
         fig_name_list = str(data_files[i].name).split("_")
         fig_name = fig_name_list[0] + "_" + fig_name_list[1] + "_" + fig_name_list[-1][:-4] + ".png"
         plt.savefig(output_path / fig_name)
-
-
