@@ -154,12 +154,14 @@ def overlay_spectra(
             title,
             x_label,
             y_label,
-            x_inv=x_inv,
             y_lim=y_lim,
             wavelength_convert=wavelength_convert,
             hold_on=True,
         )
     plt.legend(plot_labels, loc="upper right")
+
+    if x_inv:
+        plt.gca().invert_xaxis()
 
     plt.xlabel(x_label)
     plt.ylabel(y_label)
@@ -239,6 +241,8 @@ def fourier_transform(
     ifg_x: np.ndarray,
     ifg_y: np.ndarray,
     wavenumber_res: float,
+    ref_spectrum_x: np.ndarray = None,
+    ref_spectrum_y: np.ndarray = None,
     plot: bool = False,
     save_fig: bool = False,
     path_save: Union[str, Path] = None
@@ -250,6 +254,10 @@ def fourier_transform(
         ifg_x (np.ndarray[float]): Interferogram independent variable data, in units of
             "data points" (i.e. time-domain spacing to be deduced).
         ifg_y (np.ndarray[float]): Interferogram intensity data, in units of Volts.
+        ref_spectrum_x (np.ndarray[float]): Wavenumber data of reference single-beam
+            spectrum, in cm^{-1}.
+        ref_spectrum_y (np.ndarray[float]): Intensity data of reference single-beam
+            spectrum, in arbitrary units.
         plot (bool, optional): Whether to generate a plot. Defaults to False.
         save_fig (bool, optional): Whether to save output figure. Defaults to False.
         path_save (str, optional): Path to save output figure. Defaults to None.
@@ -330,15 +338,28 @@ def fourier_transform(
     spectrum_x_envelope = np.array(x_peaks)
 
     if plot:
-        plot_spectrum(
-            spectrum_x_envelope,
-            spectrum_y_envelope,
-            "Single-Beam Spectrum, FFT'd from Interferogram",
-            "Wavenumber (cm$^{-1}$)",
-            "Single-Beam Intensity (arbitrary units)",
-            x_inv=True,
-            save_fig=save_fig,
-            path_save=path_save,
-        )
+        if (ref_spectrum_x is not None) and (ref_spectrum_y is not None):
+            overlay_spectra(
+                [ref_spectrum_x, spectrum_x_envelope],
+                [ref_spectrum_y, spectrum_y_envelope],
+                "Single-Beam Spectrum, FFT'd from Interferogram",
+                "Wavenumber (cm$^{-1}$)",
+                "Single-Beam Intensity (arbitrary units)",
+                ["from software", "from FFT"],
+                x_inv=True,
+                save_fig=save_fig,
+                path_save=path_save,
+            )
+        else:
+            plot_spectrum(
+                spectrum_x_envelope,
+                spectrum_y_envelope,
+                "Single-Beam Spectrum, FFT'd from Interferogram",
+                "Wavenumber (cm$^{-1}$)",
+                "Single-Beam Intensity (arbitrary units)",
+                x_inv=True,
+                save_fig=save_fig,
+                path_save=path_save,
+            )
 
     return spectrum_x_filtered, spectrum_y_filtered
